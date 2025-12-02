@@ -1,0 +1,278 @@
+<div class="container mt-4">
+  <div class="card">
+    <div class="card-header bg-primary text-white">
+      <h4 class="mb-0">
+        <i class="fas fa-user me-2"></i>
+        {{ modoEdicion ? 'Editar Cliente' : 'Nuevo Cliente' }}
+      </h4>
+    </div>
+
+    <div class="card-body">
+      <!-- Loading -->
+      <div *ngIf="cargando && modoEdicion" class="text-center my-5">
+        <div class="spinner-border text-primary" role="status">
+          <span class="visually-hidden">Cargando...</span>
+        </div>
+        <p class="mt-2">Cargando datos del cliente...</p>
+      </div>
+
+      <!-- Error -->
+      <div *ngIf="error" class="alert alert-danger">
+        {{ error }}
+      </div>
+
+      <!-- Formulario -->
+      <form
+        [formGroup]="clienteForm"
+        (ngSubmit)="guardarCliente()"
+        *ngIf="!cargando || !modoEdicion"
+      >
+        <div class="row">
+          <!-- Columna Izquierda -->
+          <div class="col-md-6">
+            <h5 class="mb-3 border-bottom pb-2">Información Personal</h5>
+
+            <!-- DNI -->
+            <div class="mb-3">
+              <label class="form-label">DNI *</label>
+              <input
+                type="text"
+                class="form-control"
+                formControlName="dni"
+                [class.is-invalid]="esCampoInvalido('dni')"
+              />
+              <div *ngIf="esCampoInvalido('dni')" class="invalid-feedback">
+                <div *ngIf="clienteForm.get('dni')?.errors?.['required']">
+                  El DNI es requerido
+                </div>
+                <div *ngIf="clienteForm.get('dni')?.errors?.['pattern']">
+                  El DNI debe tener 8 dígitos
+                </div>
+              </div>
+            </div>
+
+            <!-- Nombres -->
+            <div class="mb-3">
+              <label class="form-label">Nombres *</label>
+              <input
+                type="text"
+                class="form-control"
+                formControlName="nombres"
+                [class.is-invalid]="esCampoInvalido('nombres')"
+              />
+              <div *ngIf="esCampoInvalido('nombres')" class="invalid-feedback">
+                Los nombres son requeridos (mínimo 2 caracteres)
+              </div>
+            </div>
+
+            <!-- Apellidos -->
+            <div class="mb-3">
+              <label class="form-label">Apellidos *</label>
+              <input
+                type="text"
+                class="form-control"
+                formControlName="apellidos"
+                [class.is-invalid]="esCampoInvalido('apellidos')"
+              />
+              <div *ngIf="esCampoInvalido('apellidos')" class="invalid-feedback">
+                Los apellidos son requeridos (mínimo 2 caracteres)
+              </div>
+            </div>
+
+            <!-- Fecha Nacimiento -->
+            <div class="mb-3">
+              <label class="form-label">Fecha de Nacimiento *</label>
+              <input
+                type="date"
+                class="form-control"
+                formControlName="fecha_nacimiento"
+                [class.is-invalid]="esCampoInvalido('fecha_nacimiento')"
+              />
+              <div *ngIf="esCampoInvalido('fecha_nacimiento')" class="invalid-feedback">
+                La fecha de nacimiento es requerida
+              </div>
+            </div>
+
+            <!-- Sexo -->
+            <div class="mb-3">
+              <label class="form-label">Sexo *</label>
+              <select
+                class="form-select"
+                formControlName="sexo"
+                [class.is-invalid]="esCampoInvalido('sexo')"
+              >
+                <option value="">Seleccionar...</option>
+                <option value="M">Masculino</option>
+                <option value="F">Femenino</option>
+              </select>
+              <div *ngIf="esCampoInvalido('sexo')" class="invalid-feedback">
+                El sexo es requerido
+              </div>
+            </div>
+
+            <!-- Estado Civil -->
+            <div class="mb-3">
+              <label class="form-label">Estado Civil *</label>
+              <select
+                class="form-select"
+                formControlName="estado_civil"
+                [class.is-invalid]="esCampoInvalido('estado_civil')"
+              >
+                <option value="">Seleccionar...</option>
+                <option value="soltero">Soltero(a)</option>
+                <option value="casado">Casado(a)</option>
+                <option value="divorciado">Divorciado(a)</option>
+                <option value="viudo">Viudo(a)</option>
+              </select>
+              <div *ngIf="esCampoInvalido('estado_civil')" class="invalid-feedback">
+                El estado civil es requerido
+              </div>
+            </div>
+
+            <!-- Dependientes -->
+            <div class="mb-3">
+              <label class="form-label">Número de Dependientes *</label>
+              <input
+                type="number"
+                class="form-control"
+                formControlName="num_dependientes"
+                min="0"
+                [class.is-invalid]="esCampoInvalido('num_dependientes')"
+              />
+              <div *ngIf="esCampoInvalido('num_dependientes')" class="invalid-feedback">
+                El número de dependientes es requerido
+              </div>
+            </div>
+          </div>
+
+          <!-- Columna Derecha -->
+          <div class="col-md-6">
+            <h5 class="mb-3 border-bottom pb-2">Información de Contacto y Laboral</h5>
+
+            <!-- Dirección -->
+            <div class="mb-3">
+              <label class="form-label">Dirección *</label>
+              <input
+                type="text"
+                class="form-control"
+                formControlName="direccion"
+                [class.is-invalid]="esCampoInvalido('direccion')"
+              />
+              <div *ngIf="esCampoInvalido('direccion')" class="invalid-feedback">
+                La dirección es requerida
+              </div>
+            </div>
+
+            <!-- Teléfono -->
+            <div class="mb-3">
+              <label class="form-label">Teléfono *</label>
+              <input
+                type="text"
+                class="form-control"
+                formControlName="telefono"
+                [class.is-invalid]="esCampoInvalido('telefono')"
+              />
+              <div *ngIf="esCampoInvalido('telefono')" class="invalid-feedback">
+                <div *ngIf="clienteForm.get('telefono')?.errors?.['required']">
+                  El teléfono es requerido
+                </div>
+                <div *ngIf="clienteForm.get('telefono')?.errors?.['pattern']">
+                  El teléfono debe tener 9 dígitos
+                </div>
+              </div>
+            </div>
+
+            <!-- Email -->
+            <div class="mb-3">
+              <label class="form-label">Email *</label>
+              <input
+                type="email"
+                class="form-control"
+                formControlName="email"
+                [class.is-invalid]="esCampoInvalido('email')"
+              />
+              <div *ngIf="esCampoInvalido('email')" class="invalid-feedback">
+                <div *ngIf="clienteForm.get('email')?.errors?.['required']">
+                  El email es requerido
+                </div>
+                <div *ngIf="clienteForm.get('email')?.errors?.['email']">
+                  Ingrese un email válido
+                </div>
+              </div>
+            </div>
+
+            <!-- Ocupación -->
+            <div class="mb-3">
+              <label class="form-label">Ocupación *</label>
+              <input
+                type="text"
+                class="form-control"
+                formControlName="ocupacion"
+                [class.is-invalid]="esCampoInvalido('ocupacion')"
+              />
+              <div *ngIf="esCampoInvalido('ocupacion')" class="invalid-feedback">
+                La ocupación es requerida
+              </div>
+            </div>
+
+            <!-- Empleador -->
+            <div class="mb-3">
+              <label class="form-label">Empleador</label>
+              <input type="text" class="form-control" formControlName="empleador" />
+            </div>
+
+            <!-- Ingreso Mensual -->
+            <div class="mb-3">
+              <label class="form-label">Ingreso Mensual (S/) *</label>
+              <input
+                type="number"
+                class="form-control"
+                formControlName="ingreso_mensual"
+                step="0.01"
+                min="0"
+                [class.is-invalid]="esCampoInvalido('ingreso_mensual')"
+              />
+              <div *ngIf="esCampoInvalido('ingreso_mensual')" class="invalid-feedback">
+                <div *ngIf="clienteForm.get('ingreso_mensual')?.errors?.['required']">
+                  El ingreso mensual es requerido
+                </div>
+                <div *ngIf="clienteForm.get('ingreso_mensual')?.errors?.['min']">
+                  El ingreso debe ser mayor a 0
+                </div>
+              </div>
+            </div>
+
+            <!-- Observaciones -->
+            <div class="mb-3">
+              <label class="form-label">Observaciones</label>
+              <textarea
+                class="form-control"
+                formControlName="observaciones"
+                rows="3"
+              ></textarea>
+            </div>
+          </div>
+        </div>
+
+        <!-- Botones -->
+        <div class="row mt-4">
+          <div class="col-12">
+            <div class="d-flex justify-content-between">
+              <button type="button" class="btn btn-secondary" (click)="cancelar()">
+                <i class="fas fa-times me-2"></i> Cancelar
+              </button>
+              <button
+                type="submit"
+                class="btn btn-primary"
+                [disabled]="clienteForm.invalid || cargando"
+              >
+                <i class="fas fa-save me-2"></i>
+                {{ cargando ? 'Guardando...' : (modoEdicion ? 'Actualizar Cliente' : 'Guardar Cliente') }}
+              </button>
+            </div>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

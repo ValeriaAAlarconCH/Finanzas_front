@@ -1,0 +1,396 @@
+<div class="container mt-4">
+  <div class="card">
+    <div class="card-header bg-primary text-white">
+      <h3 class="mb-0">
+        <i class="fas fa-calculator me-2"></i>
+        Simulador de Crédito Hipotecario
+      </h3>
+    </div>
+
+    <div class="card-body">
+      <!-- Indicador de pasos -->
+      <div class="pasos-indicador mb-5">
+        <div class="paso" [class.activo]="pasoActual === 1" (click)="pasoActual = 1">
+          <span class="numero">1</span>
+          <span class="texto">Cliente</span>
+        </div>
+        <div class="paso" [class.activo]="pasoActual === 2" (click)="pasoActual = 2">
+          <span class="numero">2</span>
+          <span class="texto">Financiero</span>
+        </div>
+        <div class="paso" [class.activo]="pasoActual === 3" (click)="pasoActual = 3">
+          <span class="numero">3</span>
+          <span class="texto">Opciones</span>
+        </div>
+        <div class="paso" [class.activo]="pasoActual === 4" (click)="pasoActual = 4">
+          <span class="numero">4</span>
+          <span class="texto">Resultados</span>
+        </div>
+      </div>
+
+      <!-- Formulario de simulación -->
+      <form [formGroup]="simulacionForm" *ngIf="!mostrarResultados">
+        <!-- Paso 1: Selección de Cliente -->
+        <div *ngIf="pasoActual === 1" class="paso-form">
+          <h4 class="mb-4">Selección del Cliente</h4>
+
+          <div class="row">
+            <div class="col-md-8">
+              <div class="mb-3">
+                <label class="form-label">Cliente *</label>
+                <select
+                  class="form-select"
+                  formControlName="idCliente"
+                  [class.is-invalid]="
+                    simulacionForm.get('idCliente')?.invalid &&
+                    simulacionForm.get('idCliente')?.touched
+                  "
+                >
+                  <option value="">Seleccione un cliente</option>
+                  <option *ngFor="let cliente of clientes" [value]="cliente.id_cliente">
+                    {{ cliente.nombres }} {{ cliente.apellidos }} - DNI: {{ cliente.dni }}
+                  </option>
+                </select>
+                <div class="form-text">Seleccione el cliente que solicita el crédito</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Paso 2: Configuración Financiera -->
+        <div *ngIf="pasoActual === 2" class="paso-form">
+          <h4 class="mb-4">Configuración Financiera</h4>
+
+          <div class="row">
+            <div class="col-md-6">
+              <div class="mb-3">
+                <label class="form-label">Monto del Crédito (S/) *</label>
+                <input
+                  type="number"
+                  class="form-control"
+                  formControlName="monto_principal"
+                  step="1000"
+                  min="1000"
+                  [class.is-invalid]="
+                    simulacionForm.get('monto_principal')?.invalid &&
+                    simulacionForm.get('monto_principal')?.touched
+                  "
+                />
+                <div
+                  *ngIf="
+                    simulacionForm.get('monto_principal')?.invalid &&
+                    simulacionForm.get('monto_principal')?.touched
+                  "
+                  class="invalid-feedback"
+                >
+                  El monto debe ser mayor a S/ 1,000
+                </div>
+              </div>
+
+              <div class="mb-3">
+                <label class="form-label">Tasa de Interés Anual (%) *</label>
+                <input
+                  type="number"
+                  class="form-control"
+                  formControlName="tasa_anual"
+                  step="0.01"
+                  min="0.1"
+                  max="30"
+                  [class.is-invalid]="
+                    simulacionForm.get('tasa_anual')?.invalid &&
+                    simulacionForm.get('tasa_anual')?.touched
+                  "
+                />
+                <div class="form-text">Tasa de interés anual (ej: 8.5 para 8.5%)</div>
+              </div>
+            </div>
+
+            <div class="col-md-6">
+              <div class="mb-3">
+                <label class="form-label">Plazo (meses) *</label>
+                <input
+                  type="number"
+                  class="form-control"
+                  formControlName="plazo_meses"
+                  min="12"
+                  max="360"
+                  [class.is-invalid]="
+                    simulacionForm.get('plazo_meses')?.invalid &&
+                    simulacionForm.get('plazo_meses')?.touched
+                  "
+                />
+                <div class="form-text">
+                  Duración del crédito en meses (mínimo 12, máximo 360)
+                </div>
+              </div>
+
+              <div class="mb-3">
+                <label class="form-label">Moneda *</label>
+                <select class="form-select" formControlName="idMoneda">
+                  <option *ngFor="let moneda of monedas" [value]="moneda.id_moneda">
+                    {{ moneda.nombre }} ({{ moneda.simbolo }})
+                  </option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <!-- Resumen estimado -->
+          <div class="card bg-light mt-3">
+            <div class="card-body">
+              <h6 class="card-title">Estimación Inicial</h6>
+              <p class="mb-1">
+                <strong>Cuota mensual estimada:</strong>
+                {{ calcularCuotaEstimada() | currency: 'S/ ' }}
+              </p>
+              <p class="mb-1">
+                <strong>Total a pagar estimado:</strong>
+                {{
+                  (calcularCuotaEstimada() * (simulacionForm.value.plazo_meses || 0))
+                    | currency: 'S/ '
+                }}
+              </p>
+              <p class="mb-0 text-muted">
+                * Esta es una estimación inicial. Los valores finales se calcularán en la
+                simulación.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Paso 3: Opciones Avanzadas -->
+        <div *ngIf="pasoActual === 3" class="paso-form">
+          <h4 class="mb-4">Opciones Avanzadas</h4>
+
+          <div class="row">
+            <div class="col-md-6">
+              <div class="mb-3">
+                <label class="form-label">Tipo de Tasa *</label>
+                <select class="form-select" formControlName="idTasa">
+                  <option *ngFor="let tipo of tiposTasa" [value]="tipo.id_tasa">
+                    {{ tipo.tipo }}
+                  </option>
+                </select>
+              </div>
+
+              <div class="mb-3">
+                <label class="form-label">Capitalización *</label>
+                <select class="form-select" formControlName="idCapitalizacion">
+                  <option
+                    *ngFor="let cap of capitalizaciones"
+                    [value]="cap.id_capitalizacion"
+                  >
+                    {{ cap.nombre }} ({{ cap.periodos_por_ano }} periodos/año)
+                  </option>
+                </select>
+              </div>
+
+              <div class="mb-3">
+                <label class="form-label">Meses de Gracia</label>
+                <input
+                  type="number"
+                  class="form-control"
+                  formControlName="meses_gracia"
+                  min="0"
+                  max="12"
+                />
+                <div class="form-text">
+                  Meses sin pago de capital (solo intereses en gracia parcial)
+                </div>
+              </div>
+            </div>
+
+            <div class="col-md-6">
+              <div class="mb-3">
+                <label class="form-label">Tipo de Gracia *</label>
+                <select class="form-select" formControlName="idGracia">
+                  <option *ngFor="let gracia of periodosGracia" [value]="gracia.id_gracia">
+                    {{ gracia.tipo }}
+                  </option>
+                </select>
+                <div class="form-text">
+                  <strong>Total:</strong> No se paga nada durante la gracia<br />
+                  <strong>Parcial:</strong> Solo se pagan intereses durante la gracia
+                </div>
+              </div>
+
+              <div class="mb-3">
+                <label class="form-label">Entidad Financiera *</label>
+                <select class="form-select" formControlName="idEntidad">
+                  <option value="">Seleccione una entidad</option>
+                  <option *ngFor="let entidad of entidades" [value]="entidad.id_entidad">
+                    {{ entidad.nombre }}
+                  </option>
+                </select>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Botones de navegación -->
+        <div class="d-flex justify-content-between mt-4">
+          <button
+            type="button"
+            class="btn btn-secondary"
+            *ngIf="pasoActual > 1"
+            (click)="pasoAnterior()"
+          >
+            <i class="fas fa-arrow-left me-2"></i> Anterior
+          </button>
+
+          <button
+            type="button"
+            class="btn btn-primary ms-auto"
+            *ngIf="pasoActual < 3"
+            (click)="siguientePaso()"
+            [disabled]="pasoActual === 1 ? !paso1Valido : !paso2Valido"
+          >
+            Siguiente <i class="fas fa-arrow-right ms-2"></i>
+          </button>
+
+          <button
+            type="button"
+            class="btn btn-success"
+            *ngIf="pasoActual === 3"
+            (click)="simular()"
+            [disabled]="!paso3Valido || cargando"
+          >
+            <i class="fas fa-calculator me-2"></i>
+            {{ cargando ? 'Simulando...' : 'Simular Crédito' }}
+          </button>
+        </div>
+      </form>
+
+      <!-- Resultados de la simulación -->
+      <div *ngIf="mostrarResultados && resultadoSimulacion" class="resultados-simulacion">
+        <h4 class="mb-4">Resultados de la Simulación</h4>
+
+        <div class="row">
+          <!-- Resumen financiero -->
+          <div class="col-md-6">
+            <div class="card mb-4">
+              <div class="card-header bg-success text-white">
+                <h5 class="mb-0">Resumen Financiero</h5>
+              </div>
+              <div class="card-body">
+                <div class="row">
+                  <div class="col-6">
+                    <p><strong>Cuota Mensual:</strong></p>
+                    <p><strong>Total a Pagar:</strong></p>
+                    <p><strong>Total Intereses:</strong></p>
+                    <p><strong>Total Seguros/Cargos:</strong></p>
+                  </div>
+                  <div class="col-6 text-end">
+                    <p>
+                      {{ resultadoSimulacion.resumen.cuotaPromedio | currency: 'S/ ' }}
+                    </p>
+                    <p>
+                      {{ resultadoSimulacion.resumen.totalPagar | currency: 'S/ ' }}
+                    </p>
+                    <p>
+                      {{ resultadoSimulacion.resumen.totalIntereses | currency: 'S/ ' }}
+                    </p>
+                    <p>
+                      {{ resultadoSimulacion.resumen.totalCargos | currency: 'S/ ' }}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Indicadores financieros -->
+          <div class="col-md-6">
+            <div class="card mb-4">
+              <div class="card-header bg-info text-white">
+                <h5 class="mb-0">Indicadores Financieros</h5>
+              </div>
+              <div class="card-body">
+                <div class="row">
+                  <div class="col-6">
+                    <p><strong>TIR:</strong></p>
+                    <p><strong>VAN:</strong></p>
+                    <p><strong>TCEA:</strong></p>
+                    <p><strong>TREA:</strong></p>
+                  </div>
+                  <div class="col-6 text-end">
+                    <p>
+                      {{ resultadoSimulacion.indicadores.TIR | number: '1.2-2' }}%
+                    </p>
+                    <p>
+                      {{ resultadoSimulacion.indicadores.VAN | currency: 'S/ ' }}
+                    </p>
+                    <p>
+                      {{ resultadoSimulacion.indicadores.TCEA | number: '1.2-2' }}%
+                    </p>
+                    <p>
+                      {{ resultadoSimulacion.indicadores.TREA | number: '1.2-2' }}%
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tabla de cronograma (primeras 12 cuotas) -->
+        <div class="card mb-4">
+          <div class="card-header">
+            <h5 class="mb-0">Cronograma de Pagos (Primeras 12 cuotas)</h5>
+          </div>
+          <div class="card-body">
+            <div class="table-responsive">
+              <table class="table table-sm table-hover">
+                <thead class="table-light">
+                <tr>
+                  <th>#</th>
+                  <th>Fecha Vencimiento</th>
+                  <th>Capital</th>
+                  <th>Interés</th>
+                  <th>Otros Cargos</th>
+                  <th>Total Cuota</th>
+                  <th>Saldo</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr
+                  *ngFor="
+                      let cuota of resultadoSimulacion.cronograma | slice: 0 : 12
+                    "
+                >
+                  <td>{{ cuota.numero_cuota }}</td>
+                  <td>{{ cuota.fecha_vencimiento | date: 'dd/MM/yyyy' }}</td>
+                  <td>
+                    {{ cuota.capital_programado | currency: 'S/ ' }}
+                  </td>
+                  <td>
+                    {{ cuota.interes_programado | currency: 'S/ ' }}
+                  </td>
+                  <td>{{ cuota.otros_cargos | currency: 'S/ ' }}</td>
+                  <td>{{ cuota.total_cuota | currency: 'S/ ' }}</td>
+                  <td>{{ cuota.saldo_final | currency: 'S/ ' }}</td>
+                </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- Botones de acción -->
+        <div class="d-flex justify-content-between mt-4">
+          <button
+            type="button"
+            class="btn btn-secondary"
+            (click)="mostrarResultados = false"
+          >
+            <i class="fas fa-arrow-left me-2"></i> Volver a modificar
+          </button>
+
+          <button type="button" class="btn btn-success" (click)="guardarCredito()">
+            <i class="fas fa-save me-2"></i> Guardar como Crédito Real
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -12,7 +12,6 @@ import { SimulacionResponse } from '../../../core/models';
 export class CreditoService {
   constructor(private api: ApiService) {}
 
-  // CRUD básico - CORREGIDO según endpoints reales
   getCreditos(): Observable<Credito[]> {
     return this.api.get<Credito[]>('/creditos/listar');
   }
@@ -33,7 +32,7 @@ export class CreditoService {
     return this.api.delete<any>(`/creditos/eliminar/${id}`);
   }
 
-  // Simulaciones - CORREGIDO según endpoints reales
+  // Simulaciones
   simularCreditoCompleto(credito: Credito): Observable<SimulacionResponse> {
     return this.api.post<SimulacionResponse>('/simulaciones/simulacion-completa', credito);
   }
@@ -42,25 +41,24 @@ export class CreditoService {
     return this.api.post<Cuota[]>('/simulaciones/generar-cronograma', credito);
   }
 
-  calcularIndicadores(credito: Credito): Observable<IndicadorFinanciero> {
-    return this.api.post<IndicadorFinanciero>('/simulaciones/calcular-indicadores', credito);
+  // Métodos para obtener datos relacionados
+  getMonedas(): Observable<any[]> {
+    return this.api.get<any[]>('/monedas/listar');
   }
 
-  // Estado de cuenta - CORREGIDO
-  getEstadoCuenta(creditoId: number, fechaCorte?: Date): Observable<any> {
-    const params: Record<string, any> = {};
-    if (fechaCorte) {
-      params['fechaCorte'] = fechaCorte.toISOString().split('T')[0];
-    }
-    return this.api.get<any>(`/pagos/estado-cuenta/${creditoId}`, params);
+  getTiposTasa(): Observable<any[]> {
+    return this.api.get<any[]>('/tipostasainteres/listar');
   }
 
-  // Métodos adicionales
-  getCreditosPorCliente(clienteId: number): Observable<Credito[]> {
-    return this.api.get<Credito[]>(`/creditos/cliente/${clienteId}`);
+  getCapitalizaciones(): Observable<any[]> {
+    return this.api.get<any[]>('/capitalizaciones/listar');
   }
 
-  getCreditosPorEstado(estado: string): Observable<Credito[]> {
-    return this.api.get<Credito[]>(`/creditos/estado/${estado}`);
+  getPeriodosGracia(): Observable<any[]> {
+    return this.api.get<any[]>('/periodosgracia/listar');
+  }
+
+  getEntidadesFinancieras(): Observable<any[]> {
+    return this.api.get<any[]>('/entidadesfinancieras/listar');
   }
 }

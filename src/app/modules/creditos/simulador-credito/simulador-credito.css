@@ -1,0 +1,89 @@
+.pasos-indicador {
+  display: flex;
+  justify-content: space-between;
+  position: relative;
+  margin-bottom: 2rem;
+}
+
+.pasos-indicador::before {
+  content: '';
+  position: absolute;
+  top: 20px;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background-color: #dee2e6;
+  z-index: 1;
+}
+
+.paso {
+  position: relative;
+  z-index: 2;
+  text-align: center;
+  flex: 1;
+  cursor: pointer;
+}
+
+.paso .numero {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background-color: #dee2e6;
+  color: #6c757d;
+  font-weight: bold;
+  margin-bottom: 8px;
+  border: 2px solid white;
+}
+
+.paso.activo .numero {
+  background-color: #0d6efd;
+  color: white;
+}
+
+.paso .texto {
+  font-size: 0.9rem;
+  color: #6c757d;
+  font-weight: 500;
+}
+
+.paso.activo .texto {
+  color: #0d6efd;
+}
+
+.paso-form {
+  animation: fadeIn 0.3s ease-in;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.resultados-simulacion {
+  animation: slideIn 0.5s ease-out;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.table-responsive {
+  max-height: 400px;
+  overflow-y: auto;
+}
