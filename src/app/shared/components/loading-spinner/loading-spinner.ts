@@ -1,8 +1,11 @@
 import { Component, OnInit } from '@angular/core';
+import { NgIf, AsyncPipe } from '@angular/common';
 import { LoaderService } from '../../../core/services/loader.service';
 
 @Component({
   selector: 'app-loading-spinner',
+  standalone: true,
+  imports: [NgIf, AsyncPipe],
   template: `
     <div class="loading-overlay" *ngIf="loading$ | async">
       <div class="spinner-container">
