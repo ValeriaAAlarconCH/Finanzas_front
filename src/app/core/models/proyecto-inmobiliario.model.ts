@@ -1,8 +1,9 @@
 export interface ProyectoInmobiliario {
   id_proyecto?: number;
-  nombre: string;
+  nombre_proyecto: string;
   direccion: string;
-  ciudad?: string;
-  pais?: string;
-  descripcion?: string;
+  descripcion: string;
+  desarrollador: string;
+  fecha_inicio: string | Date;
+  fecha_entrega_estimada: string | Date;
 }

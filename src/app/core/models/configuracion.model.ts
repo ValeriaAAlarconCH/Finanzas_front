@@ -1,7 +1,21 @@
+import { Cliente } from './cliente.model';
+import { Moneda } from './moneda.model';
+import { TipoTasaInteres } from './tipo-tasa-interes.model';
+import { Capitalizacion } from './capitalizacion.model';
+
 export interface Configuracion {
-  id_configuracion?: number;
-  clave: string;       // Ej: 'TASA_INTERES_DEFAULT'
-  valor: string;       // Se puede parsear a número/boolean si es necesario
-  descripcion?: string;
-  categoria?: string;  // 'FINANCIERA', 'SISTEMA', etc.
+  id_config?: number;
+  convencion_dias: number;
+  periodicidad: string;
+
+  cliente?: Cliente;
+  moneda?: Moneda;
+  tasa?: TipoTasaInteres;
+  capitalizacion?: Capitalizacion;
+
+  // Para compatibilidad
+  clientedto?: Cliente;
+  monedadto?: Moneda;
+  tasadto?: TipoTasaInteres;
+  capitalizaciondto?: Capitalizacion;
 }

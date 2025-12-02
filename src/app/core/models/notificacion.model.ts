@@ -1,8 +1,12 @@
 export interface Notificacion {
-  id_notificacion?: number;
-  tipo: string;        // 'INFO', 'WARN', 'ERROR', etc.
+  idNotificacion?: number;
+  tipo: string; // 'email', 'sistema', 'recordatorio'
+  destinatario: string;
+  asunto: string;
   mensaje: string;
-  fecha: string | Date;
-  leida?: boolean;
-  destino?: string;    // 'CLIENTE', 'ASESOR', etc.
+  fechaEnvio: string | Date;
+  enviada: boolean;
+  leida: boolean;
+  referenciaId?: number;
+  prioridad: string; // 'alta', 'media', 'baja'
 }

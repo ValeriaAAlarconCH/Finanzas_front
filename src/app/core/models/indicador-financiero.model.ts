@@ -1,10 +1,13 @@
 export interface IndicadorFinanciero {
-  van: number;
-  tir: number;
-  tcea: number;
-  trea: number;
-  totalIntereses: number;
-  totalCargos: number;
-  totalPagar: number;
-  cuotaPromedio: number;
+  id_indicador?: number;
+  fecha_calculo: string | Date;
+  VAN: number;
+  TIR: number;
+  TCEA: number;
+  TREA: number;
+  duracion: number;
+  duracion_modificada: number;
+  convexidad: number;
+  credito?: any;
+  creditodto?: any;
 }

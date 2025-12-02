@@ -1,8 +1,9 @@
 export interface EntidadFinanciera {
   id_entidad?: number;
   nombre: string;
-  ruc?: string;
-  direccion?: string;
-  telefono?: string;
-  contacto?: string;
+  codigo_autorizacion: string;
+  ruc: number;
+  direccion: string;
+  telefono: number;
+  email: string;
 }
